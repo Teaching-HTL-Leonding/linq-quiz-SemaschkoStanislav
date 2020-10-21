@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 
 namespace LinqQuiz.Library
 {
@@ -16,7 +18,10 @@ namespace LinqQuiz.Library
         /// </exception>
         public static int[] GetEvenNumbers(int exclusiveUpperLimit)
         {
-            throw new NotImplementedException();
+            return Enumerable.Range(1, exclusiveUpperLimit - 1)
+                .Where(o => o % 2 == 0)
+                .Select(o => o)
+                .ToArray();
         }
 
         /// <summary>
@@ -33,7 +38,10 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static int[] GetSquares(int exclusiveUpperLimit)
         {
-            throw new NotImplementedException();
+            return exclusiveUpperLimit < 8? new int[0] : Enumerable.Range(1, exclusiveUpperLimit)
+                .Reverse().Where(o => o % 7 == 0)
+                .Select(o => Math.Pow(o,2)  > int.MaxValue? throw new OverflowException() : (int)Math.Pow(o, 2))
+                .ToArray();
         }
 
         /// <summary>
@@ -52,9 +60,12 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static FamilySummary[] GetFamilyStatistic(IReadOnlyCollection<IFamily> families)
         {
-            throw new NotImplementedException();
+            return families.GroupBy(o => o.ID)
+                .Select(o => new FamilySummary { FamilyID = o.Key
+                , NumberOfFamilyMembers = o.Sum(o => o.Persons.Count())
+                , AverageAge = o.Sum(o => o.Persons.Count() == 0 ? 0 : o.Persons.Average(o => o.Age)) })
+                .ToArray();
         }
-
         /// <summary>
         /// Returns a statistic about the number of occurrences of letters in a text.
         /// </summary>
@@ -70,7 +81,10 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static (char letter, int numberOfOccurrences)[] GetLetterStatistic(string text)
         {
-            throw new NotImplementedException();
+            return text.Where(o => char.IsLetter(o))
+                .GroupBy(o => o)
+                .Select(o => (Str: o.Key, Count : o.Count()))
+                .ToArray();
         }
     }
 }
